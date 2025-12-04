@@ -1,0 +1,28 @@
+/* 基本スタイル */
+.jp-ComfyUI-Cockpit {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size1);
+}
+
+.jp-ComfyUI-Cockpit-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* MUIコンポーネントのスタイル調整 */
+.jp-ComfyUI-Cockpit-content .MuiScopedCssBaseline-root {
+  height: 100%;
+  width: 100%;
+}
+
+.jp-ComfyUI-Cockpit-content .MuiBox-root {
+  height: 100%;
+}
+

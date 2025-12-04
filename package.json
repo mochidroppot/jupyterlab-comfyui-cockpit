@@ -1,0 +1,79 @@
+{
+  "name": "jupyterlab-comfyui-cockpit",
+  "version": "0.1.0",
+  "description": "A JupyterLab extension for managing ComfyUI.",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "comfyui"
+  ],
+  "homepage": "https://github.com/mochidroppot/jupyterlab-comfyui-cockpit",
+  "bugs": {
+    "url": "https://github.com/mochidroppot/jupyterlab-comfyui-cockpit/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "mochidroppot",
+    "email": "mochidroppot@gmail.com"
+  },
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mochidroppot/jupyterlab-comfyui-cockpit.git"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:lib": "tsc",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "clean": "jlpm run clean:lib",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:labextension": "rimraf jupyterlab_comfyui_cockpit/labextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "lint": "jlpm run prettier && jlpm run eslint",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@jupyterlab/application": "^4.0.0",
+    "@jupyterlab/apputils": "^4.0.0",
+    "@jupyterlab/launcher": "^4.0.0",
+    "@jupyterlab/ui-components": "^4.0.0",
+    "@lumino/widgets": "^2.0.0",
+    "@mui/icons-material": "^5.15.0",
+    "@mui/material": "^5.15.0",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@jupyterlab/builder": "^4.0.0",
+    "@types/react": "^18.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react": "^7.0.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.0",
+    "typescript": "~5.9.2"
+  },
+  "sideEffects": [
+    "*.css",
+    "@mui/material/**/*",
+    "@mui/icons-material/**/*"
+  ],
+  "jupyterlab": {
+    "extension": true,
+    "outputDir": "jupyterlab_comfyui_cockpit/labextension"
+  }
+}

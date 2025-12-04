@@ -1,0 +1,15 @@
+{
+    "packageManager": "python",
+    "packageName": "jupyterlab_comfyui_cockpit",
+    "uninstall": [
+      {
+        "src": "share/jupyter/labextensions/jupyterlab-comfyui-cockpit",
+        "dest": "jupyterlab-comfyui-cockpit"
+      },
+      {
+        "src": "etc/jupyter/jupyter_server_config.d/jupyterlab_comfyui_cockpit.json",
+        "dest": "jupyterlab_comfyui_cockpit.json"
+      }
+    ]
+  }
+  
