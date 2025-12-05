@@ -54,7 +54,8 @@
     "@lumino/widgets": "^2.0.0",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "swr": "^2.3.7"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^4.0.0",
