@@ -1,8 +1,8 @@
 {
-    "ServerApp": {
-      "jpserver_extensions": {
-        "jupyterlab_comfyui_cockpit": true
-      }
+  "ServerApp": {
+    "jpserver_extensions": {
+      "jupyterlab_comfyui_cockpit": true
     }
   }
+}
   

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   ThemeProvider,
   createTheme,
-  Theme
+  Theme,
 } from '@mui/material/styles';
 import { ScopedCssBaseline } from '@mui/material';
 import { IThemeManager } from '@jupyterlab/apputils';

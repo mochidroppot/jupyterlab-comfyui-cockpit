@@ -1,42 +1,13 @@
 import React, { useState } from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { IThemeManager } from '@jupyterlab/apputils';
-import { Tabs, Tab, Box, Typography } from '@mui/material';
+import { Tabs, Tab, Box } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { ComfyUIThemeProvider } from './theme-provider';
-
-/**
- * タブパネルのプロパティ
- */
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-/**
- * タブパネルコンポーネント
- */
-function TabPanel(props: TabPanelProps): JSX.Element {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`comfyui-tabpanel-${index}`}
-      aria-labelledby={`comfyui-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3, height: '100%', overflow: 'auto' }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
-}
+import { TabPanel } from './components/common/TabPanel';
+import { ProcessPanel } from './features/process/ProcessPanel';
+import { WorkflowPanel } from './features/workflow/WorkflowPanel';
 
 /**
  * ComfyUI Cockpitのメインコンポーネント
@@ -74,43 +45,18 @@ const ComfyUICockpitComponent = ({
               <Tab
                 icon={<DescriptionIcon />}
                 iconPosition="start"
-                label="ログ"
+                label="ワークフロー"
                 id="comfyui-tab-1"
                 aria-controls="comfyui-tabpanel-1"
-              />
-              <Tab
-                icon={<DescriptionIcon />}
-                iconPosition="start"
-                label="ワークフロー"
-                id="comfyui-tab-2"
-                aria-controls="comfyui-tabpanel-2"
               />
             </Tabs>
           </Box>
           <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
             <TabPanel value={currentTab} index={0}>
-              <Typography variant="h6" gutterBottom>
-                プロセス管理
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                プロセス管理機能は後で実装されます。
-              </Typography>
+              <ProcessPanel />
             </TabPanel>
             <TabPanel value={currentTab} index={1}>
-              <Typography variant="h6" gutterBottom>
-                ログ確認
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                ログ確認機能は後で実装されます。
-              </Typography>
-            </TabPanel>
-            <TabPanel value={currentTab} index={2}>
-              <Typography variant="h6" gutterBottom>
-                ワークフロー管理
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                ワークフローファイル管理機能は後で実装されます。
-              </Typography>
+              <WorkflowPanel />
             </TabPanel>
           </Box>
         </Box>
@@ -131,11 +77,10 @@ export class ComfyUICockpitWidget extends ReactWidget {
     this.addClass('jp-ComfyUI-Cockpit');
     this.title.label = 'ComfyUI Cockpit';
     this.title.closable = true;
-    this.title.iconClass = 'jp-ComfyIcon'; // 後でアイコンを設定する
+    this.title.iconClass = 'jp-ComfyIcon';
   }
 
   render(): JSX.Element {
     return <ComfyUICockpitComponent themeManager={this.themeManager} />;
   }
 }
-
