@@ -7,13 +7,15 @@ from ..config import Config
 
 
 class ProcessHandler(APIHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.config = Config()
+    def initialize(self, *args, **kwargs):
+        super().initialize(*args, **kwargs)
+        self.cockpit_config = Config()
     
     @tornado.web.authenticated
     def get(self):
-        if self.config.dummy_mode:
+        self.set_header('Content-Type', 'application/json')
+
+        if self.cockpit_config.dummy_mode:
             # ダミーデータを返す
             self.finish(json.dumps({
                 "status": "running",
@@ -42,12 +44,15 @@ class ProcessHandler(APIHandler):
                 "message": output
             }))
         except Exception as e:
+            self.log.error(f"Error in ProcessHandler.get: {e}", exc_info=True)
             self.set_status(500)
             self.finish(json.dumps({"status": "error", "message": str(e)}))
 
     @tornado.web.authenticated
     def post(self):
-        if self.config.dummy_mode:
+        self.set_header('Content-Type', 'application/json')
+        
+        if self.cockpit_config.dummy_mode:
             input_data = self.get_json_body()
             action = input_data.get("action")
             
@@ -89,5 +94,6 @@ class ProcessHandler(APIHandler):
                     "message": result.stderr.strip() or result.stdout.strip()
                 }))
         except Exception as e:
+            self.log.error(f"Error in ProcessHandler.post: {e}", exc_info=True)
             self.set_status(500)
             self.finish(json.dumps({"status": "error", "message": str(e)}))

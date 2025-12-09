@@ -10,7 +10,7 @@ import StopIcon from '@mui/icons-material/Stop';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { useProcessStatus } from '../../hooks/useProcess';
 
-export const ProcessStatusArea = (): JSX.Element => {
+export const ProcessStatusArea = () => {
   const { status, isLoading, start, stop, restart } = useProcessStatus();
 
   return (

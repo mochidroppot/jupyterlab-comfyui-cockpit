@@ -4,8 +4,8 @@ import {
 } from '@jupyterlab/application';
 
 import { ILauncher } from '@jupyterlab/launcher';
-import { ICommandPalette, WidgetTracker, IThemeManager } from '@jupyterlab/apputils';
-import { ComfyUICockpitWidget } from './widget';
+import { ICommandPalette, WidgetTracker, IThemeManager, ReactWidget } from '@jupyterlab/apputils';
+import { createComfyUICockpitWidget } from './widget';
 
 /**
  * コマンドIDの定義
@@ -32,7 +32,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
     const { commands, shell } = app;
 
     // インスタンスを管理するためのトラッカーを作成
-    const tracker = new WidgetTracker<ComfyUICockpitWidget>({
+    const tracker = new WidgetTracker<ReactWidget>({
       namespace: 'comfyui-cockpit'
     });
 
@@ -59,7 +59,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           // ウィジェットが存在しない場合は新規作成
           if (!widget) {
             console.log('ComfyUI Cockpit: Creating new widget...');
-            widget = new ComfyUICockpitWidget(themeManager);
+            widget = createComfyUICockpitWidget(themeManager);
             widget.id = 'comfyui-cockpit';
             widget.title.closable = true;
             

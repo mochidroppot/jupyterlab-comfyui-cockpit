@@ -28,7 +28,10 @@ class Config:
         """プロジェクトルートの.envファイルを読み込む"""
         # プロジェクトルートを探す（__file__から遡る）
         current_file = Path(__file__)
-        project_root = current_file.parent.parent.parent
+        # config.pyは jupyterlab_comfyui_cockpit/config.py にあるので
+        # parent -> jupyterlab_comfyui_cockpit
+        # parent.parent -> プロジェクトルート
+        project_root = current_file.parent.parent
         env_path = project_root / ".env"
         
         if env_path.exists():

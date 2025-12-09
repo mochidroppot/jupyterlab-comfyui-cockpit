@@ -30,3 +30,6 @@ labextension/
 
 # Environment variables
 .env
+
+# Build artifacts
+dist/

@@ -105,3 +105,50 @@ jupyter lab
 # インストールされている拡張機能の一覧を表示
 jupyter labextension list
 ```
+
+## 本番ビルドとインストール
+
+既存の JupyterLab 環境に本番用としてインストールする手順です。
+
+### 1. パッケージのビルド
+
+配布用のパッケージ（Wheelファイル）を作成します。
+このプロセスでフロントエンドコードも自動的に本番モード（`build:prod`）でビルドされ、パッケージに含まれます。
+
+```bash
+# ビルドツールのインストール
+pip install build
+
+# パッケージのビルド
+python -m build
+```
+
+実行後、`dist/` ディレクトリに `.whl` ファイル（例：`jupyterlab_comfyui_cockpit-0.1.0-py3-none-any.whl`）が生成されます。
+
+### 2. インストール
+
+#### カレントディレクトリからインストールする場合
+
+```bash
+# -e オプションなしでインストール
+pip install .
+```
+
+#### 生成したWheelファイルからインストールする場合（推奨）
+
+Paperspace上の環境など、別の環境にデプロイする場合は、生成された `.whl` ファイルをJupyterLabのファイルブラウザ経由でアップロード（例：`/notebooks` ディレクトリなど、任意の場所）してインストールします。
+
+```bash
+# ファイル名は生成されたバージョンに合わせてください（/notebooks にアップロードした場合）
+pip install /notebooks/jupyterlab_comfyui_cockpit-0.1.0-py3-none-any.whl
+```
+
+### 3. 適用確認
+
+JupyterLabを再起動した後、拡張機能が正しく読み込まれているか確認します。
+
+```bash
+jupyter labextension list
+```
+
+`jupyterlab-comfyui-cockpit vX.X.X enabled OK` と表示されていればインストール完了です。

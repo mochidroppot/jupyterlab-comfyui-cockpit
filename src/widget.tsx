@@ -18,7 +18,7 @@ interface ComfyUICockpitComponentProps {
 
 const ComfyUICockpitComponent = ({
   themeManager
-}: ComfyUICockpitComponentProps): JSX.Element => {
+}: ComfyUICockpitComponentProps) => {
   const [currentTab, setCurrentTab] = useState(0);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -66,21 +66,19 @@ const ComfyUICockpitComponent = ({
 };
 
 /**
- * JupyterLabのウィジェットとしてラップするクラス
+ * JupyterLabのウィジェットを作成するファクトリ関数
  */
-export class ComfyUICockpitWidget extends ReactWidget {
-  private themeManager: IThemeManager | null;
-
-  constructor(themeManager: IThemeManager | null = null) {
-    super();
-    this.themeManager = themeManager;
-    this.addClass('jp-ComfyUI-Cockpit');
-    this.title.label = 'ComfyUI Cockpit';
-    this.title.closable = true;
-    this.title.iconClass = 'jp-ComfyIcon';
-  }
-
-  render(): JSX.Element {
-    return <ComfyUICockpitComponent themeManager={this.themeManager} />;
-  }
+export function createComfyUICockpitWidget(
+  themeManager: IThemeManager | null = null
+): ReactWidget {
+  const widget = ReactWidget.create(
+    <ComfyUICockpitComponent themeManager={themeManager} />
+  );
+  
+  widget.addClass('jp-ComfyUI-Cockpit');
+  widget.title.label = 'ComfyUI Cockpit';
+  widget.title.closable = true;
+  widget.title.iconClass = 'jp-ComfyIcon';
+  
+  return widget;
 }

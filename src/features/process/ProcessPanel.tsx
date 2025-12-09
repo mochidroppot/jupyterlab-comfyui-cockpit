@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { ProcessStatusArea } from './ProcessStatusArea';
 
-export const ProcessPanel = (): JSX.Element => {
+export const ProcessPanel = () => {
   return (
     <Box sx={{ p: 2 }}>
       {/* Status Area */}

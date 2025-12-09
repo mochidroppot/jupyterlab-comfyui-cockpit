@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 
-export const WorkflowPanel = (): JSX.Element => {
+export const WorkflowPanel = () => {
   return (
     <>
       <Typography variant="h6" gutterBottom>
