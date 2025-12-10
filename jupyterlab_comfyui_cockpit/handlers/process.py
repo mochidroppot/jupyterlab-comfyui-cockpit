@@ -4,6 +4,7 @@ import tornado
 from jupyter_server.base.handlers import APIHandler
 
 from ..config import Config
+from ._dummy import dummy_process_state
 
 
 class ProcessHandler(APIHandler):
@@ -16,11 +17,7 @@ class ProcessHandler(APIHandler):
         self.set_header('Content-Type', 'application/json')
 
         if self.cockpit_config.dummy_mode:
-            # ダミーデータを返す
-            self.finish(json.dumps({
-                "status": "running",
-                "message": "DUMMY: comfyui RUNNING   pid 12345, uptime 0:00:10"
-            }))
+            self.finish(json.dumps(dummy_process_state.get_status_payload()))
             return
         
         service_name = "comfyui"
@@ -61,10 +58,10 @@ class ProcessHandler(APIHandler):
                 self.finish(json.dumps({"status": "error", "message": "Invalid action"}))
                 return
             
-            # ダミーレスポンスを返す
+            result_message = dummy_process_state.perform_action(action)
             self.finish(json.dumps({
                 "status": "success",
-                "message": f"DUMMY: comfyui: {action}ed"
+                "message": result_message
             }))
             return
         

@@ -4,6 +4,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from tornado.ioloop import IOLoop, PeriodicCallback
 from jupyter_server.base.handlers import JupyterHandler
 from ..config import Config
+from ._dummy import dummy_process_state
 
 class ComfySocketHandler(JupyterHandler, WebSocketHandler):
     def initialize(self):
@@ -89,22 +90,16 @@ class ComfySocketHandler(JupyterHandler, WebSocketHandler):
         self.dummy_tasks.append(asyncio.create_task(self.dummy_status_loop()))
 
     async def dummy_status_loop(self):
-        # Simulate status
-        status = "running"
-        message = "DUMMY: comfyui RUNNING   pid 12345, uptime 0:00:10"
-        
         try:
-            # Send initial
-            self.write_message(json.dumps({
-                "type": "status",
-                "data": {"status": status, "message": message}
-            }))
-            
-            # Keep sending (or just wait)
             while True:
-                await asyncio.sleep(5)
-                # Maybe change uptime?
-                pass
+                current_data = dummy_process_state.get_status_payload()
+                if self.last_status != current_data:
+                    self.last_status = current_data
+                    self.write_message(json.dumps({
+                        "type": "status",
+                        "data": current_data
+                    }))
+                await asyncio.sleep(1)
         except (asyncio.CancelledError, WebSocketClosedError):
             pass
         except Exception as e:
