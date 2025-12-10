@@ -15,7 +15,6 @@ interface SocketMessage {
 export function useComfySocket() {
   const [status, setStatus] = useState<ProcessStatus['status']>('stopped');
   const [message, setMessage] = useState('');
-  const [logs, setLogs] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<number>();
@@ -49,15 +48,6 @@ export function useComfySocket() {
           const { status: newStatus, message: newMessage } = msg.data;
           setStatus(newStatus);
           setMessage(newMessage);
-        } else if (msg.type === 'log') {
-          setLogs(prev => {
-              const newLogs = [...prev, msg.data];
-              // Keep last 1000 lines
-              if (newLogs.length > 1000) {
-                  return newLogs.slice(-1000);
-              }
-              return newLogs;
-          });
         }
       } catch (e) {
         console.error('Error parsing socket message:', e);
@@ -94,9 +84,7 @@ export function useComfySocket() {
       }
     };
   }, [connect]);
-  
-  const clearLogs = useCallback(() => setLogs([]), []);
 
-  return { status, message, logs, isConnected, clearLogs };
+  return { status, message, isConnected };
 }
 

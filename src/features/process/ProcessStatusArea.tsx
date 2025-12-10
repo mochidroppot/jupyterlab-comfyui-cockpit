@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Typography, Button } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
@@ -13,6 +13,8 @@ interface ProcessStatusAreaProps {
   onStop: () => void;
   onRestart: () => void;
   isStartPending: boolean;
+  isStopPending: boolean;
+  isRestartPending: boolean;
 }
 
 export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
@@ -22,6 +24,8 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
   onStop,
   onRestart,
   isStartPending,
+  isStopPending,
+  isRestartPending,
 }) => {
   // Extract PID and Uptime from message if possible
   // message example: "comfyui RUNNING   pid 12345, uptime 0:00:10"
@@ -30,7 +34,8 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
   const pid = pidMatch ? pidMatch[1] : '-';
   const uptime = uptimeMatch ? uptimeMatch[1] : '-';
 
-  const isLoading = isStartPending || status === 'starting';
+  const isStartLoading = isStartPending || status === 'starting';
+  const isAnyPending = isStartPending || isStopPending || isRestartPending || status === 'starting';
 
   return (
     <Stack spacing={1}>
@@ -63,40 +68,42 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
         spacing={1}
         sx={{mt: 1}}
       >
-          <LoadingButton
+        <LoadingButton
           variant="outlined"
           color="primary"
           size="small"
           startIcon={<PlayArrowIcon/>}
           sx={{minWidth: 80}}
-          loading={isLoading}
-          disabled={status === 'running' || isLoading}
+          loading={isStartLoading}
+          disabled={status === 'running' || isAnyPending}
           onClick={onStart}
         >
           Start
         </LoadingButton>
-        <Button
+        <LoadingButton
           variant="outlined"
           color="warning"
           size="small"
           startIcon={<StopIcon/>}
           sx={{minWidth: 80}}
-          disabled={status !== 'running' || isLoading}
+          loading={isStopPending}
+          disabled={status !== 'running' || isAnyPending}
           onClick={onStop}
         >
           Stop
-        </Button>
-        <Button
+        </LoadingButton>
+        <LoadingButton
           variant="outlined"
           color="primary"
           size="small"
           startIcon={<ReplayIcon/>}
           sx={{minWidth: 80}}
-          disabled={isLoading}
+          loading={isRestartPending}
+          disabled={isAnyPending}
           onClick={onRestart}
         >
           Restart
-        </Button>
+        </LoadingButton>
       </Stack>
     </Stack>
   );

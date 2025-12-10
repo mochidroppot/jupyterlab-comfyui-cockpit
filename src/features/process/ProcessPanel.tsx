@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -8,22 +8,27 @@ import { ProcessStatusArea } from './ProcessStatusArea';
 import { useComfySocket } from '../../hooks/useComfySocket';
 import { requestAPI } from '../../handler';
 
+type ProcessAction = 'start' | 'stop' | 'restart';
+
 export const ProcessPanel = () => {
-  const { status, message, logs, isConnected } = useComfySocket();
-  const logsEndRef = useRef<HTMLDivElement>(null);
-  const [isStartPending, setIsStartPending] = useState(false);
+  const { status, message, isConnected } = useComfySocket();
+  const [pendingActions, setPendingActions] = useState<Record<ProcessAction, boolean>>({
+    start: false,
+    stop: false,
+    restart: false,
+  });
 
-  // Auto-scroll to bottom of logs
-  useEffect(() => {
-    if (logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [logs]);
+  const setPendingAction = (action: ProcessAction, value: boolean) => {
+    setPendingActions((prev) => {
+      if (prev[action] === value) {
+        return prev;
+      }
+      return { ...prev, [action]: value };
+    });
+  };
 
-  const controlProcess = async (action: 'start' | 'stop' | 'restart') => {
-    if (action === 'start') {
-      setIsStartPending(true);
-    }
+  const controlProcess = async (action: ProcessAction) => {
+    setPendingAction(action, true);
     try {
       await requestAPI<{ status: string; message: string }>('process', {
         method: 'POST',
@@ -31,17 +36,31 @@ export const ProcessPanel = () => {
       });
     } catch (error) {
       console.error(`Error ${action}ing process:`, error);
-      if (action === 'start') {
-        setIsStartPending(false);
-      }
+      setPendingAction(action, false);
     }
   };
 
   useEffect(() => {
-    if (isStartPending && (status === 'starting' || status === 'running' || status === 'error')) {
-      setIsStartPending(false);
-    }
-  }, [status, isStartPending]);
+    setPendingActions((prev) => {
+      let hasChanges = false;
+      const next = { ...prev };
+
+      if (prev.start && (status === 'starting' || status === 'running' || status === 'error')) {
+        next.start = false;
+        hasChanges = true;
+      }
+      if (prev.stop && (status === 'stopped' || status === 'error')) {
+        next.stop = false;
+        hasChanges = true;
+      }
+      if (prev.restart && (status === 'starting' || status === 'running' || status === 'error')) {
+        next.restart = false;
+        hasChanges = true;
+      }
+
+      return hasChanges ? next : prev;
+    });
+  }, [status]);
 
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
@@ -52,7 +71,9 @@ export const ProcessPanel = () => {
         onStart={() => controlProcess('start')}
         onStop={() => controlProcess('stop')}
         onRestart={() => controlProcess('restart')}
-        isStartPending={isStartPending}
+        isStartPending={pendingActions.start}
+        isStopPending={pendingActions.stop}
+        isRestartPending={pendingActions.restart}
       />
       
       {!isConnected && (
@@ -62,43 +83,6 @@ export const ProcessPanel = () => {
       )}
 
       <Divider sx={{ my: 2 }} />
-
-      {/* Logs */}
-      <Typography
-       variant="subtitle1"
-       sx={{
-        mb: 1,
-       }}
-      >
-        Logs
-      </Typography>
-      <Box
-        sx={{
-          backgroundColor: '#111',
-          color: '#eee',
-          p: 2,
-          borderRadius: 1,
-          fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-          flexGrow: 1,
-          overflowY: 'auto',
-          minHeight: 0,
-          fontSize: '0.85rem',
-          lineHeight: 1.4,
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-all'
-        }}
-      >
-        {logs.length === 0 ? (
-            <Typography variant="body2" sx={{ opacity: 0.5 }}>
-                Waiting for logs...
-            </Typography>
-        ) : (
-            logs.map((log, index) => (
-                <span key={index}>{log}</span>
-            ))
-        )}
-        <div ref={logsEndRef} />
-      </Box>
     </Box>
   );
 };
