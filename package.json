@@ -53,8 +53,10 @@
     "@jupyterlab/ui-components": "^4.0.0",
     "@lumino/widgets": "^2.0.0",
     "@mui/icons-material": "^5.15.0",
+    "@mui/lab": "5.0.0-alpha.164",
     "@mui/material": "^5.15.0",
     "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "swr": "^2.3.7"
   },
   "devDependencies": {
@@ -75,6 +77,16 @@
   ],
   "jupyterlab": {
     "extension": true,
-    "outputDir": "jupyterlab_comfyui_cockpit/labextension"
+    "outputDir": "jupyterlab_comfyui_cockpit/labextension",
+    "sharedPackages": {
+      "react": {
+        "bundled": false,
+        "singleton": true
+      },
+      "react-dom": {
+        "bundled": false,
+        "singleton": true
+      }
+    }
   }
 }

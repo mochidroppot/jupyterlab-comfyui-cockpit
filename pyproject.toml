@@ -24,6 +24,12 @@ dependencies = [
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
+[project.entry-points."jupyter_server.extension"]
+jupyterlab-comfyui-cockpit = "jupyterlab_comfyui_cockpit"
+
+[project.entry-points."jupyterlab.extension"]
+jupyterlab-comfyui-cockpit = "jupyterlab_comfyui_cockpit"
+
 [tool.hatch.version]
 source = "nodejs"
 

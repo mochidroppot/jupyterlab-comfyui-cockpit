@@ -33,3 +33,6 @@ labextension/
 
 # Build artifacts
 dist/
+
+# Editorconfig
+.editorconfig

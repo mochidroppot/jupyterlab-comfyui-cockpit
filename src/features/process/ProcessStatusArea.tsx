@@ -1,17 +1,36 @@
 import React from 'react';
-import {
-  Box,
-  Stack,
-  Typography,
-  Button,
-} from '@mui/material';
+import { Box, Stack, Typography, Button } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { useProcessStatus } from '../../hooks/useProcess';
+import { ProcessStatus } from '../../hooks/useComfySocket';
 
-export const ProcessStatusArea = () => {
-  const { status, isLoading, start, stop, restart } = useProcessStatus();
+interface ProcessStatusAreaProps {
+  status: ProcessStatus['status'];
+  message: string;
+  onStart: () => void;
+  onStop: () => void;
+  onRestart: () => void;
+  isStartPending: boolean;
+}
+
+export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
+  status,
+  message,
+  onStart,
+  onStop,
+  onRestart,
+  isStartPending,
+}) => {
+  // Extract PID and Uptime from message if possible
+  // message example: "comfyui RUNNING   pid 12345, uptime 0:00:10"
+  const pidMatch = message.match(/pid (\d+)/);
+  const uptimeMatch = message.match(/uptime ([\d:]+)/);
+  const pid = pidMatch ? pidMatch[1] : '-';
+  const uptime = uptimeMatch ? uptimeMatch[1] : '-';
+
+  const isLoading = isStartPending || status === 'starting';
 
   return (
     <Stack spacing={1}>
@@ -30,11 +49,13 @@ export const ProcessStatusArea = () => {
             {status === 'running' ? '稼働' : status === 'error' ? 'エラー' : status === 'starting' ? '起動中' : '停止'}
           </Typography>
         </Stack>
-        <Typography variant="body1">Uptime: 00:12:49</Typography>
+        {status === 'running' && <Typography variant="body1">Uptime: {uptime}</Typography>}
       </Stack>
-      <Typography variant="body2" color="text.secondary">
-        PID: 23810
-      </Typography>
+      {status === 'running' && (
+        <Typography variant="body2" color="text.secondary">
+          PID: {pid}
+        </Typography>
+      )}
 
       {/* Controls */}
       <Stack
@@ -42,17 +63,18 @@ export const ProcessStatusArea = () => {
         spacing={1}
         sx={{mt: 1}}
       >
-          <Button
+          <LoadingButton
           variant="outlined"
           color="primary"
           size="small"
           startIcon={<PlayArrowIcon/>}
           sx={{minWidth: 80}}
+          loading={isLoading}
           disabled={status === 'running' || isLoading}
-          onClick={start}
+          onClick={onStart}
         >
           Start
-        </Button>
+        </LoadingButton>
         <Button
           variant="outlined"
           color="warning"
@@ -60,7 +82,7 @@ export const ProcessStatusArea = () => {
           startIcon={<StopIcon/>}
           sx={{minWidth: 80}}
           disabled={status !== 'running' || isLoading}
-          onClick={stop}
+          onClick={onStop}
         >
           Stop
         </Button>
@@ -71,7 +93,7 @@ export const ProcessStatusArea = () => {
           startIcon={<ReplayIcon/>}
           sx={{minWidth: 80}}
           disabled={isLoading}
-          onClick={restart}
+          onClick={onRestart}
         >
           Restart
         </Button>
