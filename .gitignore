@@ -15,7 +15,6 @@ __pycache__/
 
 # Node.js build artifacts
 node_modules/
-yarn.lock
 .yarn/
 
 # Jupyter Lab extension build artifacts

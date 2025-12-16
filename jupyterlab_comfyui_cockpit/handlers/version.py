@@ -1,7 +1,7 @@
 import json
 import subprocess
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 import tornado
 from jupyter_server.base.handlers import APIHandler
 
@@ -76,11 +76,40 @@ class VersionHandler(APIHandler):
         # gitが使えない場合は空のリストを返す
         return []
 
-    def _switch_version(self, target_version: str) -> Dict[str, any]:
+    def _tag_exists(self, tag: str) -> bool:
+        comfyui_path = self._get_comfyui_path()
+        try:
+            result = subprocess.run(
+                ["git", "-C", str(comfyui_path), "tag", "--list", tag],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode != 0:
+                return False
+            return any(line.strip() == tag for line in result.stdout.splitlines())
+        except Exception:
+            return False
+
+    def _switch_version(self, target_version: str) -> Dict[str, Any]:
         """ComfyUIのバージョンを切り替え（完全自動化）"""
         comfyui_path = self._get_comfyui_path()
 
         try:
+            if not target_version or any(ch.isspace() for ch in target_version):
+                return {
+                    "success": False,
+                    "message": "Invalid version",
+                    "version": None,
+                }
+
+            if not self._tag_exists(target_version):
+                return {
+                    "success": False,
+                    "message": f"Unknown version: {target_version}",
+                    "version": None,
+                }
+
             # ステップ1: git checkout
             self.log.info(f"Switching to version {target_version}...")
             result = subprocess.run(
@@ -189,7 +218,24 @@ class VersionHandler(APIHandler):
         self.set_header('Content-Type', 'application/json')
 
         try:
-            data = json.loads(self.request.body)
+            try:
+                data = self.get_json_body()
+            except Exception:
+                self.set_status(400)
+                self.finish(json.dumps({
+                    "success": False,
+                    "message": "Invalid JSON data"
+                }))
+                return
+
+            if not isinstance(data, dict):
+                self.set_status(400)
+                self.finish(json.dumps({
+                    "success": False,
+                    "message": "Invalid JSON data"
+                }))
+                return
+
             target_version = data.get('version')
 
             if not target_version:
@@ -211,13 +257,6 @@ class VersionHandler(APIHandler):
                 result = self._switch_version(target_version)
 
             self.finish(json.dumps(result))
-
-        except json.JSONDecodeError:
-            self.set_status(400)
-            self.finish(json.dumps({
-                "success": False,
-                "message": "Invalid JSON data"
-            }))
         except Exception as e:
             self.log.error(f"Error in POST version: {e}")
             self.set_status(500)
@@ -225,5 +264,4 @@ class VersionHandler(APIHandler):
                 "success": False,
                 "message": f"Internal server error: {str(e)}"
             }))
-
 

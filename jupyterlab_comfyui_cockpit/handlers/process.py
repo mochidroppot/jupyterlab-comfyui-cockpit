@@ -48,9 +48,19 @@ class ProcessHandler(APIHandler):
     @tornado.web.authenticated
     def post(self):
         self.set_header('Content-Type', 'application/json')
+        try:
+            input_data = self.get_json_body()
+        except Exception:
+            self.set_status(400)
+            self.finish(json.dumps({"status": "error", "message": "Invalid JSON data"}))
+            return
+
+        if not isinstance(input_data, dict):
+            self.set_status(400)
+            self.finish(json.dumps({"status": "error", "message": "Invalid JSON data"}))
+            return
         
         if self.cockpit_config.dummy_mode:
-            input_data = self.get_json_body()
             action = input_data.get("action")
             
             if action not in ["start", "stop", "restart"]:
@@ -65,7 +75,6 @@ class ProcessHandler(APIHandler):
             }))
             return
         
-        input_data = self.get_json_body()
         action = input_data.get("action")
 
         if action not in ["start", "stop", "restart"]:
