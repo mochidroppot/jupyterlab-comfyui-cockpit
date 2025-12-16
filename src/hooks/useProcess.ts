@@ -14,7 +14,7 @@ export function useProcessStatus() {
     'process',
     fetcher,
     {
-      refreshInterval: 2000, // 2秒ごとにポーリング
+      refreshInterval: 5000, // 5秒ごとにポーリング
       revalidateOnFocus: true, // ウィンドウフォーカス時に再検証
     }
   );

@@ -4,7 +4,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import ReplayIcon from '@mui/icons-material/Replay';
-import { ProcessStatus } from '../../hooks/useComfySocket';
+import { ProcessStatus } from '../../hooks/useProcess';
 
 interface ProcessStatusAreaProps {
   status: ProcessStatus['status'];
@@ -15,6 +15,7 @@ interface ProcessStatusAreaProps {
   isStartPending: boolean;
   isStopPending: boolean;
   isRestartPending: boolean;
+  disabled?: boolean;
 }
 
 export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
@@ -26,6 +27,7 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
   isStartPending,
   isStopPending,
   isRestartPending,
+  disabled = false,
 }) => {
   // Extract PID and Uptime from message if possible
   // message example: "comfyui RUNNING   pid 12345, uptime 0:00:10"
@@ -75,7 +77,7 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
           startIcon={<PlayArrowIcon/>}
           sx={{minWidth: 80}}
           loading={isStartLoading}
-          disabled={status === 'running' || isAnyPending}
+          disabled={disabled || status === 'running' || isAnyPending}
           onClick={onStart}
         >
           Start
@@ -87,7 +89,7 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
           startIcon={<StopIcon/>}
           sx={{minWidth: 80}}
           loading={isStopPending}
-          disabled={status !== 'running' || isAnyPending}
+          disabled={disabled || status !== 'running' || isAnyPending}
           onClick={onStop}
         >
           Stop
@@ -99,7 +101,7 @@ export const ProcessStatusArea: React.FC<ProcessStatusAreaProps> = ({
           startIcon={<ReplayIcon/>}
           sx={{minWidth: 80}}
           loading={isRestartPending}
-          disabled={isAnyPending}
+          disabled={disabled || isAnyPending}
           onClick={onRestart}
         >
           Restart

@@ -1,0 +1,53 @@
+name: Build wheel and attach to release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install Python build dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install build hatchling hatch-nodejs-version hatch-jupyter-builder jupyterlab==4.5.0
+
+      - name: Install JS dependencies
+        run: jlpm install --frozen-lockfile
+
+      - name: Build sdist and wheel
+        run: python -m build --no-isolation
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/*
+
+      - name: Upload wheel to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: dist/*
